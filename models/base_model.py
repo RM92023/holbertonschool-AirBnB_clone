@@ -2,7 +2,7 @@
 '''Important several modules'''
 import uuid
 from datetime import *
-
+from models import storage
 
 '''Create the class call BaseModel'''
 
@@ -21,6 +21,7 @@ class BaseModel:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
+            storage.new(self)
 
     '''Defining the function str'''
     def __str__(self):
@@ -31,6 +32,7 @@ class BaseModel:
     updated_at with the current datetime'''
     def save(self):
         self.updated_at = datetime.now()
+        storage.save()
 
     '''returns a dictionary containing all keys/values
     of __dict__ of the instance'''
