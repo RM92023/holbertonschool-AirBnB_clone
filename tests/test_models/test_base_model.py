@@ -11,13 +11,13 @@ class TestBaseModel(unittest.TestCase):
         prev_updated_at = self.base_model.updated_at
         self.base_model.save()
         self.assertNotEqual(prev_updated_at, self.base_model.updated_at)
-    
+
     def test_id(self):
         self.assertIsInstance(self.base_model.id, str)
 
     def test_created_at(self):
         self.assertIsInstance(self.base_model.created_at, datetime)
-        
+
     def test_save_updates_updated_at(self):
         prev_updated_at = self.base_model.updated_at
         self.base_model.save()
@@ -33,8 +33,12 @@ class TestBaseModel(unittest.TestCase):
 
     def test_str(self):
         class_name = self.base_model.__class__.__name__
-        expected_output = "[{}] ({}) {}".format(class_name, self.base_model.id, self.base_model.__dict__)
+        expected_output = "[{}] ({}) {}".format(
+            class_name, self.base_model.id, self.base_model.__dict__)
         self.assertEqual(str(self.base_model), expected_output)
+
+    def tearDown(self):
+        self.base_model = None
 
 
 if __name__ == "__main__":
