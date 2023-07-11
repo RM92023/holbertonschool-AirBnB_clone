@@ -11,6 +11,12 @@ class TestBaseModel(unittest.TestCase):
         prev_updated_at = self.base_model.updated_at
         self.base_model.save()
         self.assertNotEqual(prev_updated_at, self.base_model.updated_at)
+    
+    def test_id(self):
+        self.assertIsInstance(self.base_model.id, str)
+
+    def test_created_at(self):
+        self.assertIsInstance(self.base_model.created_at, datetime)
 
     def test_to_dict(self):
         expected_keys = ['id', 'created_at', 'updated_at', '__class__']
