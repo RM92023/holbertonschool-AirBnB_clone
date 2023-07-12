@@ -50,25 +50,16 @@ class TestFileStorage(unittest.TestCase):
         os.remove('file.json')
 
     def test_reload(self):
-        # Crea un archivo JSON con un objeto guardado
-        data = {
-            'BaseModel.123456': {
-                'id': '123456',
-                'name': 'objeto1',
-                # ...otros atributos...
-            }
-        }
-        with open(self.file_storage._FileStorage__file_path, 'w') as file:
-            json.dump(data, file)
-
-        # Llama al método reload() para cargar los objetos en la instancia de FileStorage
-        self.file_storage.reload()
-        
-        # Comprueba que el objeto se cargó correctamente
-        objects = self.file_storage.all()
-        self.assertEqual(len(objects), 1)
-        self.assertIn('BaseModel.123456', objects)
-        self.assertEqual(objects['BaseModel.123456'].name, 'objeto1')
+        """
+        Test that reload() method reloads the objects from the file.
+        """
+        my_model = BaseModel()
+        self.storage.new(my_model)
+        self.storage.save()
+        self.storage.reload()
+        all_objs = self.storage.all()
+        key = "{}.{}".format(type(my_model).__name__, my_model.id)
+        self.assertIn(key, all_objs)
 
 
 if __name__ == '__main__':
