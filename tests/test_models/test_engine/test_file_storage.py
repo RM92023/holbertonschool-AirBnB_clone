@@ -1,4 +1,5 @@
 import unittest
+import json
 from datetime import datetime
 from models.engine.file_storage import FileStorage
 from models.base_model import BaseModel
@@ -41,13 +42,11 @@ class TestFileStorage(unittest.TestCase):
         Test that save() method saves the objects to the file.
         """
         my_model = BaseModel()
-        storage = FileStorage()
-        my_model = storage
         self.storage.new(my_model)
         self.storage.save()
-        # with open(self.storage._FileStorage__file_path, 'r') as file:
-        #     data = file.read()
-        # self.assertNotEqual(data, "")
+        with open(self.storage._FileStorage__file_path, 'r') as file:
+            data = file.read()
+        self.assertNotEqual(data, "")
 
     def test_reload(self):
         """
@@ -75,13 +74,16 @@ class TestBaseModel(unittest.TestCase):
         self.assertTrue(hasattr(my_model, "updated_at"))
 
     def test_save(self):
-        """
-        Test that save() method updates the updated_at attribute.
-        """
-        my_model = BaseModel()
-        previous_updated_at = my_model.updated_at
-        my_model.save()
-        self.assertNotEqual(previous_updated_at, my_model.updated_at)
+        # Agregar objetos de prueba a __objects
+        obj1 = {'id': '1', 'name': 'obj1'}
+        obj2 = {'id': '2', 'name': 'obj2'}
+        self.storage._FileStorage__objects['obj1'] = obj1
+        self.storage._FileStorage__objects['obj2'] = obj2
+        self.storage.save()
+        with open(self.storage._FileStorage__file_path, 'r') as file:
+            saved_data = json.load(file)
+            self.assertEqual(saved_data['obj1'], obj1)
+            self.assertEqual(saved_data['obj2'], obj2)
 
 
 if __name__ == '__main__':
