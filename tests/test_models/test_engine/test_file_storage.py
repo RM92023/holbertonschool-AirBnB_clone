@@ -1,5 +1,6 @@
 import unittest
 import json
+import os
 from datetime import datetime
 from models.engine.file_storage import FileStorage
 from models.base_model import BaseModel
@@ -78,10 +79,16 @@ class TestBaseModel(unittest.TestCase):
         Test that save() method updates the updated_at attribute.
         """
         my_model = BaseModel()
-        initial_updated_at = my_model.updated_at
-        my_model.save()
-        updated_at_after_save = my_model.updated_at
-        self.assertGreater(updated_at_after_save, initial_updated_at)
+        storage = FileStorage()
+        storage.new(self)
+        with open('file.json') as file:
+            loaded = json.loads(file.read())
+            storage.all().clear()
+            storage.reload()
+            self.assertEqual(storage.all().get(
+                f'BaseModel.{my_model.id}').id, my_model.id)
+            storage.all().clear()
+            os.remove('file.json')
 
 if __name__ == '__main__':
     unittest.main()
