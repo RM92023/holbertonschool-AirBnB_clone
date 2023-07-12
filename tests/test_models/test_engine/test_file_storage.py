@@ -77,10 +77,10 @@ class TestBaseModel(unittest.TestCase):
         """
         Test that save() method updates the updated_at attribute.
         """
-        self.updated_at = datetime.utcnow()
-        initial_updated_at = self.base_model.updated_at
-        self.base_model.save()
-        updated_at_after_save = self.base_model.updated_at
+        my_model = BaseModel()
+        initial_updated_at = my_model.updated_at
+        my_model.save()
+        updated_at_after_save = my_model.updated_at
         self.assertGreater(updated_at_after_save, initial_updated_at)
 
 if __name__ == '__main__':
