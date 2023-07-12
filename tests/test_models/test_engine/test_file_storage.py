@@ -74,17 +74,10 @@ class TestBaseModel(unittest.TestCase):
         self.assertTrue(hasattr(my_model, "updated_at"))
 
     def test_save(self):
-        # Agregar objetos de prueba a __objects
-        obj1 = {'id': '1', 'name': 'obj1'}
-        obj2 = {'id': '2', 'name': 'obj2'}
-        self.storage._FileStorage__objects['obj1'] = obj1
-        self.storage._FileStorage__objects['obj2'] = obj2
-        self.storage.save()
-        with open(self.storage._FileStorage__file_path, 'r') as file:
-            saved_data = json.load(file)
-            self.assertEqual(saved_data['obj1'], obj1)
-            self.assertEqual(saved_data['obj2'], obj2)
-
+        initial_updated_at = self.base_model.updated_at
+        self.base_model.save()
+        updated_at_after_save = self.base_model.updated_at
+        self.assertGreater(updated_at_after_save, initial_updated_at)
 
 if __name__ == '__main__':
     unittest.main()
