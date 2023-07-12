@@ -74,6 +74,10 @@ class TestBaseModel(unittest.TestCase):
         # self.assertTrue(hasattr(my_model, "created_at"))
         # self.assertTrue(hasattr(my_model, "updated_at"))
 
+    def save(self):
+        self.updated_at = datetime.utcnow()
+
+
     def test_save_method(self):
         Newstorage = FileStorage()
         myModels = BaseModel()
