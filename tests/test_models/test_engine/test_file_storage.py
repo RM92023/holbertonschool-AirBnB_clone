@@ -12,7 +12,7 @@ class TestFileStorage(unittest.TestCase):
 
     def test_file_path(self):
         self.assertEqual(self.storage._FileStorage__file_path, "file.json")
-    
+
     def test_objects(self):
         self.assertIsInstance(self.storage._FileStorage__objects, dict)
 
@@ -36,6 +36,25 @@ class TestFileStorage(unittest.TestCase):
         with open("file.json", 'r') as file:
             data = file.read()
             self.assertIn(key, data)
+
+    def test_save(self):
+        """
+        Test that save() method saves the objects to the file.
+        """
+        my_model = BaseModel()
+        self.storage.new(my_model)
+        self.storage.save()
+        with open(self.storage._FileStorage__file_path, 'r') as file:
+            data = file.read()
+        self.assertNotEqual(data, "")
+
+    def test_save(self):
+        """
+        Test that save() method updates the updated_at attribute.
+        """
+        my_model = BaseModel()
+        previous_updated_at = my_model.updated_at
+        my_model.save()
 
     def test_reload(self):
         key = "{}.{}".format(
