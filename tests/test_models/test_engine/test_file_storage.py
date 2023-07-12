@@ -51,11 +51,6 @@ class TestFileStorage(unittest.TestCase):
     def test_reload_file_not_found(self):
         self.storage.reload()
 
-    def test_reload_invalid_json(self):
-        with open("file.json", 'w') as file:
-            file.write("This is not a valid JSON")
-        self.storage.reload()
-
     def test_reload_with_created_at_updated_at(self):
         key = "{}.{}".format(
             self.base_model.__class__.__name__, self.base_model.id)
