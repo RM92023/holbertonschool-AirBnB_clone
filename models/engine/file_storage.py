@@ -3,7 +3,7 @@
 import json
 import os
 import importlib
-
+from models.base_model import BaseModel
 '''Create to class call Filestorage'''
 
 
@@ -13,21 +13,25 @@ class FileStorage:
     __objects = {}
 
     '''Function that return a object'''
+
     def all(self):
         return self.__objects
 
     '''sets in __objects the obj with key'''
+
     def new(self, obj):
         key = "{}.{}".format(obj.__class__.__name__, obj.id)
         self.__objects[key] = obj
 
     '''Function that serializes __objects to the JSON file '''
+
     def save(self):
         obj_dict = {key: obj.to_dict() for key, obj in self.__objects.items()}
         with open(self.__file_path, 'w') as file:
             json.dump(obj_dict, file)
 
     '''deserializes the JSON file to __objects'''
+
     def reload(self):
         if os.path.isfile(self.__file_path):
             try:
@@ -35,10 +39,7 @@ class FileStorage:
                     obj_dict = json.load(file)
                     for key, value in obj_dict.items():
                         class_name = value['__class__']
-                        module_name, class_name = class_name.rsplit('.', 1)
-                        module = importlib.import_module(module_name)
-                        class_ = getattr(module, class_name)
-                        obj = class_(**value)
+                        obj = eval(class_name)(**value)
                         self.__objects[key] = obj
             except FileNotFoundError:
                 return
