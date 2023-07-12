@@ -6,20 +6,16 @@ import cmd
 
 class HBNBCommand(cmd.Cmd):
     '''Command interprete'''
-    while True:
-        try:
-            command = input('(hbnb) ')
-            
-            if not command:
-                continue
-
-            if command == 'help':
-                continue
-
-            if command == 'quit':
-                break
-        except EOFError:
-            break
+    prompt = '(hbnb) '
+    
+    def do_quit(self, arg):
+        return True
+    
+    def do_EOF(self, arg):
+        return True
+    
+    def emptyline(self):
+        return True
 
 
 if __name__ == '__main__':
