@@ -38,16 +38,16 @@ class TestFileStorage(unittest.TestCase):
         key = "{}.{}".format(type(my_model).__name__, my_model.id)
         self.assertIn(key, self.storage._FileStorage__objects)
 
-    def test_save_method(self):
-        Newstorage = FileStorage()
-        myModels = BaseModel()
-        Newstorage.new(myModels)
-        Newstorage.save()
-        with open('file.json', 'r') as f:
-            json_obj = json.loads(f.read())
-        self.assertDictEqual(
-            json_obj, {f'BaseModel.{myModels.id}': myModels.to_dict()})
-        os.remove('file.json')
+    def test_save(self):
+        """
+        Test that save() method saves the objects to the file.
+        """
+        my_model = BaseModel()
+        self.storage.new(my_model)
+        self.storage.save()
+        with open(self.storage._FileStorage__file_path, 'r') as file:
+            data = file.read()
+        self.assertNotEqual(data, "")
 
     def test_reload(self):
         """

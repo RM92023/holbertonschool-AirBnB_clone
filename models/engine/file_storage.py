@@ -1,14 +1,15 @@
 #!/usr/bin/python3
 '''Import several library'''
 import json
-import os
-import importlib
 from models.base_model import BaseModel
 '''Create to class call Filestorage'''
 
 
 class FileStorage:
     '''Attributes for tha class'''
+    classes = {
+    'BaseModel': BaseModel,
+    }
     __file_path = 'file.json'
     __objects = {}
 
@@ -26,17 +27,14 @@ class FileStorage:
     '''Function that serializes __objects to the JSON file '''
 
     def save(self):
-        obj_dict = {key: obj.to_dict() for key, obj in self.__objects.items()}
-        with open(self.__file_path, 'w') as file:
-            json.dump(obj_dict, file)
+        data = {}
+        for key, value in self.__objects.items():
+            data[key] = value.to_dict()
 
     
 
     '''deserializes the JSON file to __objects'''
     def reload(self):
-        class_mapping = {
-            'BaseModel': BaseModel,
-            }
         try:
             with open(self.__file_path, "r") as file:
                 data = json.load(file)
