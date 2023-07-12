@@ -13,6 +13,11 @@ class TestFileStorage(unittest.TestCase):
     def test_file_path(self):
         self.assertEqual(self.storage._FileStorage__file_path, "file.json")
 
+    def TestSave(self):
+        prev_updated_at = self.base_model.updated_at
+        self.base_model.save()
+        self.assertNotEqual(prev_updated_at, self.base_model.updated_at)
+    
     def test_objects(self):
         self.assertIsInstance(self.storage._FileStorage__objects, dict)
 
