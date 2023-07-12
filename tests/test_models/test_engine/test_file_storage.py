@@ -78,17 +78,13 @@ class TestBaseModel(unittest.TestCase):
         """
         Test that save() method updates the updated_at attribute.
         """
-        my_model = BaseModel()
         storage = FileStorage()
-        storage.new(self)
-        with open('file.json') as file:
-            loaded = json.loads(file.read())
-            storage.all().clear()
-            storage.reload()
-            self.assertEqual(storage.all().get(
-                f'BaseModel.{my_model.id}').id, my_model.id)
-            storage.all().clear()
-            os.remove('file.json')
+        my_model = BaseModel()
+        storage.new(my_model)
+        storage.save()
+        with open('file.json', 'r') as f:
+            json_obj = json.loads(f.read())
+        self.assertDictEqual(json_obj, {f'BaseModel.{my_model.id}': my_model.to_dict()})
 
 if __name__ == '__main__':
     unittest.main()
