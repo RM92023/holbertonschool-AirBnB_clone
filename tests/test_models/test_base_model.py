@@ -47,6 +47,11 @@ class TestBaseModel(unittest.TestCase):
             class_name, self.base_model.id, self.base_model.__dict__)
         self.assertEqual(str(self.base_model), expected_output)
 
+    def test_base_model_save(self):
+        initial_updated_at = self.base_model.updated_at
+        self.base_model.save()
+        updated_at_after_save = self.base_model.updated_at
+        self.assertGreater(updated_at_after_save, initial_updated_at)
 
     def tearDown(self):
         self.base_model = None

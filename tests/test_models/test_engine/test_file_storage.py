@@ -75,15 +75,7 @@ class TestFileStorage(unittest.TestCase):
             self.storage._FileStorage__objects[key].updated_at.isoformat(),
             updated_at
         )
-        
-        def test_base_model_save(self):
-            obj = BaseModel()
-            obj.save()
-            objects = self.storage.all()
-            key = "{}.{}".format(obj.__class__.__name__, obj.id)
-            self.assertIn(key, objects)
-            self.assertEqual(objects[key], obj)
-    
+
     def tearDown(self):
         self.base_model = None
 
