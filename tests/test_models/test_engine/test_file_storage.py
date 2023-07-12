@@ -1,7 +1,6 @@
 import unittest
 import json
 from datetime import datetime
-from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
 
 
@@ -52,6 +51,7 @@ class TestFileStorage(unittest.TestCase):
         self.assertEqual(
             self.storage._FileStorage__objects[key].id, self.base_model.id)
 
+from models.base_model import BaseModel
 
 class TestBaseModel(unittest.TestCase):
     def setUp(self):
