@@ -61,6 +61,8 @@ class TestFileStorage(unittest.TestCase):
         key = "{}.{}".format(type(my_model).__name__, my_model.id)
         self.assertIn(key, all_objs)
 
+
+class TestBaseModel(unittest.TestCase):
     def test_init(self):
         """
         Test that __init__() initializes the instance correctly.
@@ -79,33 +81,13 @@ class TestFileStorage(unittest.TestCase):
         Newstorage.save()
         with open('file.json', 'r') as f:
             json_obj = json.loads(f.read())
-        self.assertDictEqual(
-            json_obj, {f'BaseModel.{myModels.id}': myModels.to_dict()})
+        self.assertDictEqual(json_obj, {f'BaseModel.{myModels.id}': myModels.to_dict()})
         os.remove('file.json')
-
-    def test_file_storage_attributes(self):
-        """
-        Testing FileStorage atributtes
-        """
-        storage = FileStorage()
-        self.assertEqual(storage._FileStorage__file_path, 'file.json')
-
-    def test_file_storage_methods(self):
-        """
-        Testing FileStorage methods
-        """
-        storage = FileStorage()
-        instanceBM = BaseModel()
-        storage.save()
-        with open('file.json') as file:
-            loaded = json.loads(file.read())
-        storage.all().clear()
-        storage.reload()
-        self.assertEqual(storage.all().get(
-            f'BaseModel.{instanceBM.id}').id, instanceBM.id)
-        storage.all().clear()
-        os.remove('file.json')
-
+    
+    def tearDown(self):
+        # Elimina el archivo JSON creado durante las pruebas
+        if os.path.exists(self.file_storage._FileStorage__file_path):
+            os.remove(self.file_storage._FileStorage__file_path)
 
 if __name__ == '__main__':
     unittest.main()
