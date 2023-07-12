@@ -37,25 +37,6 @@ class TestFileStorage(unittest.TestCase):
             data = file.read()
             self.assertIn(key, data)
 
-    def test_save(self):
-        """
-        Test that save() method saves the objects to the file.
-        """
-        my_model = BaseModel()
-        self.storage.new(my_model)
-        self.storage.save()
-        with open(self.storage._FileStorage__file_path, 'r') as file:
-            data = file.read()
-        self.assertNotEqual(data, "")
-
-    def test_save(self):
-        """
-        Test that save() method updates the updated_at attribute.
-        """
-        my_model = BaseModel()
-        previous_updated_at = my_model.updated_at
-        my_model.save()
-
     def test_reload(self):
         key = "{}.{}".format(
             self.base_model.__class__.__name__, self.base_model.id)
@@ -94,6 +75,19 @@ class TestFileStorage(unittest.TestCase):
             self.storage._FileStorage__objects[key].updated_at.isoformat(),
             updated_at
         )
+
+    def test_init(self):
+        self.base_model.save()
+        key = "{}.{}".format(
+            self.base_model.__class__.__name__, self.base_model.id)
+        self.assertIn(key, self.storage._FileStorage__objects)
+        self.assertEqual(
+            self.storage._FileStorage__objects[key], self.base_model)
+
+    def TestSave(self):
+        prev_updated_at = self.base_model.updated_at
+        self.base_model.save()
+        self.assertNotEqual(prev_updated_at, self.base_model.updated_at)
 
     def tearDown(self):
         self.base_model = None
