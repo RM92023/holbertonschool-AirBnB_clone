@@ -35,17 +35,16 @@ class FileStorage:
     '''deserializes the JSON file to __objects'''
     def reload(self):
         class_mapping = {
-    'BaseModel': BaseModel,
-    }
-        if os.path.isfile(self.__file_path):
-            try:
-                with open(self.__file_path, 'r') as file:
-                    obj_dict = json.load(file)
-                    for key, value in obj_dict.items():
-                        class_name = value['__class__']
-                        if class_name in class_mapping:
-                            class_ = class_mapping[class_name]
-                            obj = class_(**value)
-                            self.__objects[key] = obj
-            except FileNotFoundError:
-                return
+            'BaseModel': BaseModel,
+            }
+        try:
+            with open(self.__file_path, "r") as file:
+                data = json.load(file)
+                for key, value in data.items():
+                    class_name, obj_id = key.split('.')
+                    class_obj = globals().get(class_name)
+                    if class_obj:
+                        instance = class_obj(**value)
+                        self.new(instance)
+        except FileNotFoundError:
+            pass
