@@ -48,6 +48,39 @@ class TestFileStorage(unittest.TestCase):
         self.assertEqual(
             self.storage._FileStorage__objects[key].id, self.base_model.id)
 
+    def test_reload_file_not_found(self):
+        self.storage.reload()
+
+    def test_reload_invalid_json(self):
+        with open("file.json", 'w') as file:
+            file.write("This is not a valid JSON")
+        self.storage.reload()
+
+    def test_reload_with_created_at_updated_at(self):
+        key = "{}.{}".format(
+            self.base_model.__class__.__name__, self.base_model.id)
+        created_at = datetime.now().isoformat()
+        updated_at = datetime.now().isoformat()
+        obj_dict = {
+            key: {
+                "__class__": self.base_model.__class__.__name__,
+                "id": self.base_model.id,
+                "created_at": created_at,
+                "updated_at": updated_at
+            }
+        }
+        with open("file.json", 'w') as file:
+            file.write(json.dumps(obj_dict))
+        self.storage.reload()
+        self.assertEqual(
+            self.storage._FileStorage__objects[key].created_at.isoformat(),
+            created_at
+        )
+        self.assertEqual(
+            self.storage._FileStorage__objects[key].updated_at.isoformat(),
+            updated_at
+        )
+    
     def tearDown(self):
         self.base_model = None
 
