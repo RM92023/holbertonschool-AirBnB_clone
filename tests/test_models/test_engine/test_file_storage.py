@@ -12,11 +12,6 @@ class TestFileStorage(unittest.TestCase):
 
     def test_file_path(self):
         self.assertEqual(self.storage._FileStorage__file_path, "file.json")
-
-    def TestSave(self):
-        prev_updated_at = self.base_model.updated_at
-        self.base_model.save()
-        self.assertNotEqual(prev_updated_at, self.base_model.updated_at)
     
     def test_objects(self):
         self.assertIsInstance(self.storage._FileStorage__objects, dict)
@@ -80,6 +75,14 @@ class TestFileStorage(unittest.TestCase):
             self.storage._FileStorage__objects[key].updated_at.isoformat(),
             updated_at
         )
+        
+        def test_base_model_save(self):
+            obj = BaseModel()
+            obj.save()
+            objects = self.storage.all()
+            key = "{}.{}".format(obj.__class__.__name__, obj.id)
+            self.assertIn(key, objects)
+            self.assertEqual(objects[key], obj)
     
     def tearDown(self):
         self.base_model = None
