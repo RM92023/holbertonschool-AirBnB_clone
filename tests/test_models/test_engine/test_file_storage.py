@@ -74,6 +74,9 @@ class TestBaseModel(unittest.TestCase):
         self.assertTrue(hasattr(my_model, "updated_at"))
 
     def test_save(self):
+        """
+        Test that save() method updates the updated_at attribute.
+        """
         self.updated_at = datetime.utcnow()
         initial_updated_at = self.base_model.updated_at
         self.base_model.save()
