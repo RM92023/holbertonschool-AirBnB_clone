@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 '''Import several library'''
 import json
+import os
+import importlib
 
 '''Create to class call Filestorage'''
 
@@ -27,12 +29,16 @@ class FileStorage:
 
     '''deserializes the JSON file to __objects'''
     def reload(self):
-        try:
-            with open(self.__file_path, 'r') as file:
-                obj_dict = json.load(file)
-                for key, value in obj_dict.items():
-                    class_name = value['__class__']
-                    obj = eval(class_name)(**value)
-                    self.__objects[key] = obj
-        except FileNotFoundError:
-            pass
+        if os.path.isfile(self.__file_path):
+            try:
+                with open(self.__file_path, 'r') as file:
+                    obj_dict = json.load(file)
+                    for key, value in obj_dict.items():
+                        class_name = value['__class__']
+                        module_name, class_name = class_name.rsplit('.', 1)
+                        module = importlib.import_module(module_name)
+                        class_ = getattr(module, class_name)
+                        obj = class_(**value)
+                        self.__objects[key] = obj
+            except FileNotFoundError:
+                return
