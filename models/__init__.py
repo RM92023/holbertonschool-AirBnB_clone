@@ -1,3 +1,6 @@
-from engine.file_storage import FileStorage
+from models.engine.file_storage import FileStorage
+'''create the variable storage,
+an instance of FileStorage'''
 
-storage = FileStorage.reload()
+storage = FileStorage()
+storage.reload()
