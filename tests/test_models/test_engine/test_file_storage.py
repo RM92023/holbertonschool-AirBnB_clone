@@ -1,8 +1,9 @@
 import unittest
 import json
+import os
 from datetime import datetime
-from models.engine.file_storage import FileStorage
 from models.base_model import BaseModel
+from models.engine.file_storage import FileStorage
 
 
 class TestFileStorage(unittest.TestCase):
@@ -37,6 +38,17 @@ class TestFileStorage(unittest.TestCase):
         key = "{}.{}".format(type(my_model).__name__, my_model.id)
         self.assertIn(key, self.storage._FileStorage__objects)
 
+    def test_save_method(self):
+        Newstorage = FileStorage()
+        myModels = BaseModel()
+        Newstorage.new(myModels)
+        Newstorage.save()
+        with open('file.json', 'r') as f:
+            json_obj = json.loads(f.read())
+        self.assertDictEqual(
+            json_obj, {f'BaseModel.{myModels.id}': myModels.to_dict()})
+        os.remove('file.json')
+    
     def test_save(self):
         """
         Test that save() method saves the objects to the file.
@@ -60,28 +72,6 @@ class TestFileStorage(unittest.TestCase):
         key = "{}.{}".format(type(my_model).__name__, my_model.id)
         self.assertIn(key, all_objs)
 
-
-class TestBaseModel(unittest.TestCase):
-    def test_init(self):
-        """
-        Test that __init__() initializes the instance correctly.
-        """
-        my_model = BaseModel(name="Test", value=10)
-        self.assertEqual(my_model.name, "Test")
-        self.assertEqual(my_model.value, 10)
-        self.assertTrue(hasattr(my_model, "id"))
-        self.assertTrue(hasattr(my_model, "created_at"))
-        self.assertTrue(hasattr(my_model, "updated_at"))
-
-    def test_save(self):
-        """
-        Test that save() method updates the updated_at attribute.
-        """
-        self.updated_at = datetime.utcnow()
-        initial_updated_at = self.base_model.updated_at
-        self.base_model.save()
-        updated_at_after_save = self.base_model.updated_at
-        self.assertGreater(updated_at_after_save, initial_updated_at)
 
 if __name__ == '__main__':
     unittest.main()
