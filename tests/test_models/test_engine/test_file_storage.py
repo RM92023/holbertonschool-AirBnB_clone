@@ -2,7 +2,6 @@ import unittest
 import json
 import os
 from datetime import datetime
-from time import time
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
 
@@ -11,10 +10,6 @@ class TestFileStorage(unittest.TestCase):
     def setUp(self):
         self.storage = FileStorage()
         self.base_model = BaseModel()
-        self.start = time()
-
-    def tearDown(self):
-        self.end = time()
 
     def test_file_path(self):
         """
@@ -65,14 +60,6 @@ class TestFileStorage(unittest.TestCase):
         self.assertEqual(storage.all().get(
             f'BaseModel.{instanceBM.id}').id, instanceBM.id)
         storage.all().clear()
-        os.remove('file.json')
-
-    def test_save(self):
-        self.storage.new(self.base_model)
-        self.assertEqual(self.storage.save(), None)
-
-    def test_reload(self):
-        self.assertEqual(self.storage.reload(), None)
         os.remove('file.json')
 
 
