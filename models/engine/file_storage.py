@@ -6,7 +6,7 @@ from models.base_model import BaseModel
 '''Create to class call Filestorage'''
 
 
-class FileStorage:
+class FileStorage():
     '''Attributes for tha class'''
 
     __file_path = 'file.json'
@@ -20,9 +20,7 @@ class FileStorage:
     '''sets in __objects the obj with key'''
 
     def new(self, obj):
-        key = "{}.{}".format(obj.__class__.__name__, obj.id)
-        self.__objects[key] = obj
-
+        self.__objects[f"{obj.__class__.__name__}.{obj.id}"] = obj
     '''Function that serializes __objects to the JSON file '''
 
     def save(self):
