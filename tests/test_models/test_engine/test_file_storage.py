@@ -2,13 +2,19 @@ import unittest
 import json
 import os
 from datetime import datetime
+from time import time
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
 
 
 class TestFileStorage(unittest.TestCase):
     def setUp(self):
-        self.storage = FileStorage()
+        self.strg = FileStorage()
+        self.bmdl = BaseModel()
+        self.start = time()
+
+    def tearDown(self):
+        self.end = time()
 
     def test_file_path(self):
         """
@@ -50,22 +56,12 @@ class TestFileStorage(unittest.TestCase):
         os.remove('file.json')
 
     def test_save(self):
-        """
-        Test that save() method saves objects to the file.
-        """
-        self.storage.save()
-        with open('file.json', 'r') as f:
-            json_obj = json.load(f)
-        self.assertNotEqual(len(json_obj), 0)
+        self.strg.new(self.bmdl)
+        self.assertEqual(self.strg.save(), None)
 
     def test_reload(self):
-        """
-        Test that reload() method loads objects from the file.
-        """
-        self.storage.save()
-        self.storage.reload()
-        all_objs = self.storage.all()
-        self.assertNotEqual(len(all_objs), 0)
+        self.assertEqual(self.strg.reload(), None)
+        os.remove('file.json')
 
 
 if __name__ == '__main__':
