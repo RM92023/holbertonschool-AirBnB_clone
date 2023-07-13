@@ -62,6 +62,17 @@ class TestFileStorage(unittest.TestCase):
         storage.all().clear()
         os.remove('file.json')
 
+    def test_save(self):
+        """
+        Test that save() method updates the updated_at attribute.
+        """
+        BaseModel = getattr(__import__('models.tmp_base_model'), 'BaseModel')
+        my_model = BaseModel()
+        initial_updated_at = my_model.updated_at
+        my_model.save()
+        updated_at_after_save = my_model.updated_at
+        self.assertNotEqual(initial_updated_at, updated_at_after_save)
+        self.assertIsInstance(updated_at_after_save, datetime)
 
 if __name__ == '__main__':
     unittest.main()
