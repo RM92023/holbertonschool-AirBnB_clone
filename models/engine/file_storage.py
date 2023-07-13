@@ -25,13 +25,11 @@ class FileStorage():
 
     def save(self):
         """
-        This method saves the dictionary of objects to the JSON file.
+        Save the objects to the file.
         """
-        objects_dict = {}
-        for key, value in self.__objects.items():
-            objects_dict[key] = value.to_dict()
-        with open(self.__file_path, "w", encoding='utf-8') as fl:
-            json.dump(objects_dict, fl, indent=4)
+        with open(self._FileStorage__file_path, "w") as file:
+            file.write(json.dumps(self._FileStorage__objects))
+        return None
 
     '''deserializes the JSON file to __objects'''
 
