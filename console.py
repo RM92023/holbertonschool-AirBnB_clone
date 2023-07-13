@@ -136,16 +136,16 @@ if __name__ == '__main__':
     HBNBCommand().cmdloop()
 
 
-def complete_add(self, text: str) -> str:
+    def complete_add(self, text: str) -> str:
 
-    options = [
-        'quit', 'help', 'all', 'show', 'destroy', 'update', 'BaseModel',
-        'User', 'Place', 'State', 'City', 'Amenity', 'Review'
-    ]
-    if text:
-        return [option for option in options if option.startswith(text)]
-    else:
-        return options
+        options = [
+            'quit', 'help', 'all', 'show', 'destroy', 'update', 'BaseModel',
+            'User', 'Place', 'State', 'City', 'Amenity', 'Review'
+        ]
+        if text:
+            return [option for option in options if option.startswith(text)]
+        else:
+            return options
 
     def default(self, line: str) -> None:
 
@@ -154,124 +154,124 @@ def complete_add(self, text: str) -> str:
         print(print_string)
 
 
-def emptyline(self) -> None:
+    def emptyline(self) -> None:
 
-    pass
-
-
-def do_count(self, args: str) -> None:
-
-    arg_list = args.split()
-    if not arg_list:
-        print("** class name missing **")
-        return
-    if arg_list and arg_list[0] not in class_names_str:
-        print("** class doesn't exist **")
-        return
-    class_count = 0
-    for key in all_data.keys():
-        to_compare = key.split('.')[0]
-        if to_compare == arg_list[0]:
-            class_count += 1
-    print(class_count)
+        pass
 
 
-def _parse_args(self, arguments: str) -> Tuple[str, str]:
+    def do_count(self, args: str) -> None:
 
-    try:
-        method = arguments.split('(')[0].strip('.')
-        raw_args = arguments.split('(')[1].strip(')')
+        arg_list = args.split()
+        if not arg_list:
+            print("** class name missing **")
+            return
+        if arg_list and arg_list[0] not in class_names_str:
+            print("** class doesn't exist **")
+            return
+        class_count = 0
+        for key in all_data.keys():
+            to_compare = key.split('.')[0]
+            if to_compare == arg_list[0]:
+                class_count += 1
+        print(class_count)
 
-        is_dict = False
-        for i in raw_args:
-            if i == '{':
-                is_dict = True
-        if is_dict:
-            line_parse = raw_args.split('{')
-            id_string = line_parse[0].replace('"', '').replace(",", "")
-            dict = "{" + line_parse[1]
-            args = f"{id_string} {dict}"
-        else:
-            ag_lt = raw_args.split(", ")
-            if len(ag_lt) == 3:
-                if isinstance(eval(ag_lt[2]), int):
-                    args = (raw_args.replace(',', '')).replace('"', '')
-                else:
-                    arg = (ag_lt[0] + " " + ag_lt[1]).replace('"', '')
-                    args = arg + " " + ag_lt[2]
+
+    def _parse_args(self, arguments: str) -> Tuple[str, str]:
+
+        try:
+            method = arguments.split('(')[0].strip('.')
+            raw_args = arguments.split('(')[1].strip(')')
+
+            is_dict = False
+            for i in raw_args:
+                if i == '{':
+                    is_dict = True
+            if is_dict:
+                line_parse = raw_args.split('{')
+                id_string = line_parse[0].replace('"', '').replace(",", "")
+                dict = "{" + line_parse[1]
+                args = f"{id_string} {dict}"
             else:
-                args = (raw_args.replace(',', '')).replace('"', '')
-    except Exception as e:
-        print("Syntax Error")
-        print("Error: ", e)
-        return
+                ag_lt = raw_args.split(", ")
+                if len(ag_lt) == 3:
+                    if isinstance(eval(ag_lt[2]), int):
+                        args = (raw_args.replace(',', '')).replace('"', '')
+                    else:
+                        arg = (ag_lt[0] + " " + ag_lt[1]).replace('"', '')
+                        args = arg + " " + ag_lt[2]
+                else:
+                    args = (raw_args.replace(',', '')).replace('"', '')
+        except Exception as e:
+            print("Syntax Error")
+            print("Error: ", e)
+            return
 
-    callerframerecord = inspect.stack()[1]
+        callerframerecord = inspect.stack()[1]
 
-    frame = callerframerecord[0]
+        frame = callerframerecord[0]
 
-    info = inspect.getframeinfo(frame)
-
-
-    name_function = info.function.strip("do_")
-
-    if args != "":
-        internal_args = f"{name_function} {args}"
-    else:
-        internal_args = f"{name_function}"
-
-    return (method, internal_args)
+        info = inspect.getframeinfo(frame)
 
 
-def _execute(self, method: str, internal_args: str) -> None:
+        name_function = info.function.strip("do_")
 
-    try:
-        eval("self.do_{}".format(method))(internal_args)
-    except Exception:
-        print("Be sure that the argument is valid")
+        if args != "":
+            internal_args = f"{name_function} {args}"
+        else:
+            internal_args = f"{name_function}"
 
-
-def do_BaseModel(self, arguments: str) -> None:
-
-    method, internal_args = self._parse_args(arguments)
-    self._execute(method, internal_args)
+        return (method, internal_args)
 
 
-def do_User(self, arguments: str) -> None:
+    def _execute(self, method: str, internal_args: str) -> None:
 
-    method, internal_args = self._parse_args(arguments)
-    self._execute(method, internal_args)
-
-
-def do_Place(self, arguments: str) -> None:
-
-    method, internal_args = self._parse_args(arguments)
-    self._execute(method, internal_args)
+        try:
+            eval("self.do_{}".format(method))(internal_args)
+        except Exception:
+            print("Be sure that the argument is valid")
 
 
-def do_Amenity(self, arguments: str) -> None:
+    def do_BaseModel(self, arguments: str) -> None:
 
-    method, internal_args = self._parse_args(arguments)
-    self._execute(method, internal_args)
-
-
-def do_City(self, arguments: str) -> None:
-
-    method, internal_args = self._parse_args(arguments)
-    self._execute(method, internal_args)
+        method, internal_args = self._parse_args(arguments)
+        self._execute(method, internal_args)
 
 
-def do_Review(self, arguments: str) -> None:
+    def do_User(self, arguments: str) -> None:
 
-    method, internal_args = self._parse_args(arguments)
-    self._execute(method, internal_args)
-
-
-def do_State(self, arguments: str) -> None:
-
-    method, internal_args = self._parse_args(arguments)
-    self._execute(method, internal_args)
+        method, internal_args = self._parse_args(arguments)
+        self._execute(method, internal_args)
 
 
-if __name__ == '__main__':
-    HBNBCommand().cmdloop()
+    def do_Place(self, arguments: str) -> None:
+
+        method, internal_args = self._parse_args(arguments)
+        self._execute(method, internal_args)
+
+
+    def do_Amenity(self, arguments: str) -> None:
+
+        method, internal_args = self._parse_args(arguments)
+        self._execute(method, internal_args)
+
+
+    def do_City(self, arguments: str) -> None:
+
+        method, internal_args = self._parse_args(arguments)
+        self._execute(method, internal_args)
+
+
+    def do_Review(self, arguments: str) -> None:
+
+        method, internal_args = self._parse_args(arguments)
+        self._execute(method, internal_args)
+
+
+    def do_State(self, arguments: str) -> None:
+
+        method, internal_args = self._parse_args(arguments)
+        self._execute(method, internal_args)
+
+
+    if __name__ == '__main__':
+        HBNBCommand().cmdloop()
