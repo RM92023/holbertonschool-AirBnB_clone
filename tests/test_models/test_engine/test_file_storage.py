@@ -9,8 +9,8 @@ from models.engine.file_storage import FileStorage
 
 class TestFileStorage(unittest.TestCase):
     def setUp(self):
-        self.strg = FileStorage()
-        self.bmdl = BaseModel()
+        self.storage = FileStorage()
+        self.base_model = BaseModel()
         self.start = time()
 
     def tearDown(self):
@@ -56,12 +56,18 @@ class TestFileStorage(unittest.TestCase):
         os.remove('file.json')
 
     def test_save(self):
-        self.strg.new(self.bmdl)
-        self.assertEqual(self.strg.save(), None)
+        self.storage.new(self.base_model)
+        self.assertEqual(self.storage.save(), None)
 
     def test_reload(self):
-        self.assertEqual(self.strg.reload(), None)
+        self.assertEqual(self.storage.reload(), None)
         os.remove('file.json')
+
+    def test_file_path_none_returns_ok(self):
+        storage = FileStorage()
+        storage._FileStorage__file_path = None
+        result = storage.save()
+        self.assertEqual(result, "OK")
 
 
 if __name__ == '__main__':
