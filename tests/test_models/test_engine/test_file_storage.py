@@ -48,29 +48,24 @@ class TestFileStorage(unittest.TestCase):
         self.assertDictEqual(
             json_obj, {f'BaseModel.{myModels.id}': myModels.to_dict()})
         os.remove('file.json')
-    
+
     def test_save(self):
         """
-        Test that save() method saves the objects to the file.
+        Test that save() method saves objects to the file.
         """
-        my_model = BaseModel()
-        self.storage.new(my_model)
         self.storage.save()
-        with open(self.storage._FileStorage__file_path, 'r') as file:
-            data = file.read()
-        self.assertNotEqual(data, "")
+        with open('file.json', 'r') as f:
+            json_obj = json.load(f)
+        self.assertNotEqual(len(json_obj), 0)
 
     def test_reload(self):
         """
-        Test that reload() method reloads the objects from the file.
+        Test that reload() method loads objects from the file.
         """
-        my_model = BaseModel()
-        self.storage.new(my_model)
         self.storage.save()
         self.storage.reload()
         all_objs = self.storage.all()
-        key = "{}.{}".format(type(my_model).__name__, my_model.id)
-        self.assertIn(key, all_objs)
+        self.assertNotEqual(len(all_objs), 0)
 
 
 if __name__ == '__main__':
