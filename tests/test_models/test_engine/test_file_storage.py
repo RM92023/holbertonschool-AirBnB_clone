@@ -73,6 +73,7 @@ class TestFileStorage(unittest.TestCase):
         updated_at_after_save = my_model.updated_at
         self.assertNotEqual(initial_updated_at, updated_at_after_save)
         self.assertIsInstance(updated_at_after_save, datetime)
+        self.assertEqual(my_model.save(), None)
 
 if __name__ == '__main__':
     unittest.main()
