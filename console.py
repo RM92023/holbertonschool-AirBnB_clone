@@ -35,18 +35,19 @@ class HBNBCommand(cmd.Cmd):
         if not arg_list:
             print("** class name missing **")
             return
+        
         class_name = arg_list[0]
         if class_name not in class_names_str:
             print("** class doesn't exist **")
             return
 
-        if class_name == "User":
-            new_instance = User()
-        else:
+        try:
             new_instance = eval(class_name)()
-
-        new_instance.save()
-        print(new_instance.id)
+            new_instance.save()
+            print(new_instance.id)
+            storage.save()  # Save the instance to the JSON file
+        except Exception as e:
+            print("** creation failed: {}".format(str(e)))
 
 
     def do_show(self, args: str) -> None:
