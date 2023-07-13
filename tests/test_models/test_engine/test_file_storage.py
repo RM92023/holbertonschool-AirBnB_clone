@@ -68,11 +68,12 @@ class TestFileStorage(unittest.TestCase):
         os.remove('file.json')
 
     def test_save(self):
+        self.base_model.updated_at = datetime.utcnow()
         self.storage.new(self.base_model)
         self.assertEqual(self.storage.save(), None)
 
     def test_reload(self):
-        self.assertEqual(self.storage.reload(), None)
+        self.assertEqual(self.strg.reload(), None)
         os.remove('file.json')
 
 
