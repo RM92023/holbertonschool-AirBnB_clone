@@ -1,203 +1,139 @@
 import cmd
-import sys
 import json
-from datetime import datetime
 from models.base_model import BaseModel
-from models.engine.file_storage import FileStorage
 
 
 class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
-    file = None
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.storage = FileStorage()
-        self.storage.reload()
-
-    def emptyline(self):
-        """
-        Do nothing when empty line is entered.
-        """
-        pass
 
     def do_quit(self, arg):
-        """
-        Quit command to exit the program.
-        """
+        """Exit the program."""
         return True
 
     def do_EOF(self, arg):
-        """
-        Exit the program when End-of-File character is reached (Ctrl+D).
-        """
-        print()
+        """Exit the program on EOF (Ctrl+D)."""
         return True
 
+    def emptyline(self):
+        """Do nothing on empty line."""
+        pass
+
     def do_create(self, arg):
-        """
-        Create a new instance of BaseModel,
-        save it to the JSON file, and print the id.
-        """
+        """Create a new instance of BaseModel."""
         if not arg:
             print("** class name missing **")
-            return
-
-        class_name = arg.strip()
-        try:
-            new_instance = eval(class_name)()
-            new_instance.save()
-            print(new_instance.id)
-        except NameError:
-            print("** class doesn't exist **")
+        else:
+            try:
+                class_name = arg
+                new_instance = BaseModel()
+                new_instance.save()
+                print(new_instance.id)
+            except Exception as e:
+                print("** class doesn't exist **")
 
     def do_show(self, arg):
-        """
-        Print the string representation of an
-        instance based on the class name and id.
-        """
+        """Show the string representation of an instance."""
         args = arg.split()
         if not args:
             print("** class name missing **")
-            return
-
-        class_name = args[0]
-        if class_name not in self.storage.classes():
-            print("** class doesn't exist **")
-            return
-
-        if len(args) < 2:
+        elif len(args) < 2:
             print("** instance id missing **")
-            return
-
-        obj_id = args[1]
-        obj_key = "{}.{}".format(class_name, obj_id)
-        objects = self.storage.all()
-
-        if obj_key in objects:
-            print(objects[obj_key])
         else:
-            print("** no instance found **")
+            class_name = args[0]
+            instance_id = args[1]
+            try:
+                with open("file.json", 'r') as file:
+                    data = json.load(file)
+                    key = "{}.{}".format(class_name, instance_id)
+                    if key in data:
+                        instance_data = data[key]
+                        instance = BaseModel(**instance_data)
+                        print(instance)
+                    else:
+                        print("** no instance found **")
+            except FileNotFoundError:
+                print("** no instance found **")
 
     def do_destroy(self, arg):
-        """
-        Delete an instance based on the class name and id.
-        """
+        """Delete an instance based on class name and id."""
         args = arg.split()
         if not args:
             print("** class name missing **")
-            return
-
-        class_name = args[0]
-        if class_name not in self.storage.classes():
-            print("** class doesn't exist **")
-            return
-
-        if len(args) < 2:
+        elif len(args) < 2:
             print("** instance id missing **")
-            return
-
-        obj_id = args[1]
-        obj_key = "{}.{}".format(class_name, obj_id)
-        objects = self.storage.all()
-
-        if obj_key in objects:
-            del objects[obj_key]
-            self.storage.save()
         else:
-            print("** no instance found **")
+            class_name = args[0]
+            instance_id = args[1]
+            try:
+                with open("file.json", 'r+') as file:
+                    data = json.load(file)
+                    key = "{}.{}".format(class_name, instance_id)
+                    if key in data:
+                        del data[key]
+                        file.seek(0)
+                        json.dump(data, file)
+                        file.truncate()
+                    else:
+                        print("** no instance found **")
+            except FileNotFoundError:
+                print("** no instance found **")
 
     def do_all(self, arg):
-        """
-        Print string representations of all
-        instances based on the class name or all classes.
-        """
-        objects = self.storage.all()
-
-        if arg:
-            class_name = arg.strip()
-            if class_name not in self.storage.classes():
-                print("** class doesn't exist **")
-                return
-
-            filtered_objects = {
-                k: v for k, v in objects.items() if class_name in k
-            }
-
-            print([str(v) for v in filtered_objects.values()])
-        else:
-            print([str(v) for v in objects.values()])
+        """Print all string representations of instances."""
+        class_name = arg.split()[0] if arg else None
+        try:
+            with open("file.json", 'r') as file:
+                data = json.load(file)
+                instances = []
+                if class_name:
+                    for key, value in data.items():
+                        if key.split('.')[0] == class_name:
+                            instance = BaseModel(**value)
+                            instances.append(str(instance))
+                else:
+                    for value in data.values():
+                        instance = BaseModel(**value)
+                        instances.append(str(instance))
+                print(instances)
+        except FileNotFoundError:
+            print("** class doesn't exist **")
 
     def do_update(self, arg):
-        """
-        Update an instance based on the class name and id.
-        """
+        """Update an instance based on class name and id."""
         args = arg.split()
         if not args:
             print("** class name missing **")
-            return
-
-        class_name = args[0]
-        if class_name not in self.storage.classes():
-            print("** class doesn't exist **")
-            return
-
-        if len(args) < 2:
+        elif len(args) < 2:
             print("** instance id missing **")
-            return
-
-        obj_id = args[1]
-        obj_key = "{}.{}".format(class_name, obj_id)
-        objects = self.storage.all()
-
-        if obj_key not in objects:
-            print("** no instance found **")
-            return
-
-        if len(args) < 3:
+        elif len(args) < 3:
             print("** attribute name missing **")
-            return
-
-        attr_name = args[2]
-        if len(args) < 4:
+        elif len(args) < 4:
             print("** value missing **")
-            return
+        else:
+            class_name = args[0]
+            instance_id = args[1]
+            attribute_name = args[2]
+            attribute_value = args[3]
 
-        attr_value = args[3]
-        obj = objects[obj_key]
-
-        try:
-            attr_value = eval(attr_value)
-        except (NameError, SyntaxError):
-            pass
-
-        setattr(obj, attr_name, attr_value)
-        obj.save()
-
-    def postloop(self):
-        """
-        Print a new line after executing the command.
-        """
-        print()
-
-    def precmd(self, line):
-        """
-        Store the current command in the file attribute for later use.
-        """
-        self.file.write(line + '\n')
-        return line
-
-    def preloop(self):
-        """
-        Load the previous commands from the file if provided.
-        """
-        try:
-            self.file = open('.hbnb_history', 'r')
-            self.history = self.file.readlines()
-            self.history = [cmd.strip() for cmd in self.history]
-            self.file.close()
-        except IOError:
-            self.file = None
+            try:
+                with open("file.json", 'r+') as file:
+                    data = json.load(file)
+                    key = "{}.{}".format(class_name, instance_id)
+                    if key in data:
+                        instance_data = data[key]
+                        instance = BaseModel(**instance_data)
+                        if hasattr(instance, attribute_name):
+                            setattr(instance, attribute_name, attribute_value)
+                            data[key] = instance.to_dict()
+                            file.seek(0)
+                            json.dump(data, file)
+                            file.truncate()
+                        else:
+                            print("** attribute doesn't exist **")
+                    else:
+                        print("** no instance found **")
+            except FileNotFoundError:
+                print("** no instance found **")
 
 
 if __name__ == '__main__':
