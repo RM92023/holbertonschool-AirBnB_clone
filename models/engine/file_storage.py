@@ -1,31 +1,33 @@
 #!/usr/bin/python3
-'''Import several library'''
-import json
+"""Create class file storage"""
+
 import os
+import json
 from models.base_model import BaseModel
-'''Create to class call Filestorage'''
 
 
 class FileStorage:
-    '''Attributes for tha class'''
+    """
+    FileStorage class that manages the storage
+    and retrieval of objects in a JSON file.
+    """
 
-    __file_path = 'file.json'
+    __file_path = "file.json"
     __objects = {}
 
-    '''Function that return a object'''
-
     def all(self):
+        """
+        Returns the dictionary of stored objects.
+        """
         return self.__objects
 
-    '''sets in __objects the obj with key'''
-
     def new(self, obj):
-        key = "{}.{}".format(obj.__class__.__name__, obj.id)
-        self.__objects[key] = obj
-
-    '''Function that serializes __objects to the JSON file '''
+        """Set in __objects obj with key <obj_class_name>.id"""
+        newObjName = obj.__class__.__name__
+        self.__objects["{}.{}".format(newObjName, obj.id)] = obj
 
     def save(self):
+
         """Serialize __objects to the JSON file __file_path."""
         if self.__file_path is None:
 
@@ -35,21 +37,28 @@ class FileStorage:
             json.dump(obj_dict, file)
             return "OK"
 
-    '''deserializes the JSON file to __objects'''
+    def load(self):
+        """
+        Loads the content of the JSON file into the dictionary of objects.
+        If the file doesn't exist, no exception is raised.
+        """
+        try:
+            with open(self.__file_path, "r") as file:
+                data = json.load(file)
+                self.__objects = {key: self.__create_instance(
+                    key, value) for key, value in data.items()}
+        except FileNotFoundError:
+            pass
 
     def reload(self):
-        class_mapping = {
-            'BaseModel': BaseModel,
-        }
-        if os.path.isfile(self.__file_path):
-            try:
-                with open(self.__file_path, 'r') as file:
-                    obj_dict = json.load(file)
-                    for key, value in obj_dict.items():
-                        class_name = value['__class__']
-                        if class_name in class_mapping:
-                            class_ = class_mapping[class_name]
-                            obj = class_(**value)
-                            self.__objects[key] = obj
-            except FileNotFoundError:
-                return
+        """
+        Reloads the content of the JSON file into the dictionary of objects.
+        """
+        if os.path.exists(self.__file_path):
+            with open(self.__file_path, "r") as file:
+                try:
+                    data = json.load(file)
+                    self.__objects = {key: self.__create_instance(
+                        key, value) for key, value in data.items()}
+                except json.JSONDecodeError:
+                    pass
