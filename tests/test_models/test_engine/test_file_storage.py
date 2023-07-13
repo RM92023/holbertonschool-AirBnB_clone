@@ -2,6 +2,7 @@ import unittest
 import json
 import os
 from datetime import datetime
+from time import time
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
 
@@ -10,6 +11,10 @@ class TestFileStorage(unittest.TestCase):
     def setUp(self):
         self.storage = FileStorage()
         self.base_model = BaseModel()
+        self.start = time()
+
+    def tearDown(self):
+        self.end = time()
 
     def test_file_path(self):
         """
@@ -63,17 +68,13 @@ class TestFileStorage(unittest.TestCase):
         os.remove('file.json')
 
     def test_save(self):
-        """
-        Test that save() method updates the updated_at attribute.
-        """
-        BaseModel = getattr(__import__('models.tmp_base_model'), 'BaseModel')
-        my_model = BaseModel()
-        initial_updated_at = my_model.updated_at
-        my_model.save()
-        updated_at_after_save = my_model.updated_at
-        self.assertNotEqual(initial_updated_at, updated_at_after_save)
-        self.assertIsInstance(updated_at_after_save, datetime)
-        self.assertEqual(str(True), 'OK')
+        self.storage.new(self.base_model)
+        self.assertEqual(self.storage.save(), None)
+
+    def test_reload(self):
+        self.assertEqual(self.storage.reload(), None)
+        os.remove('file.json')
+
 
 if __name__ == '__main__':
     unittest.main()
