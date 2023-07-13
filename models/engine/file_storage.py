@@ -26,14 +26,14 @@ class FileStorage:
     '''Function that serializes __objects to the JSON file '''
 
     def save(self):
-        """Serialize __objects to the JSON file __file_path."""
-        if self.__file_path is None:
-
-            return "OK"
-        obj_dict = {key: obj.to_dict() for key, obj in self.__objects.items()}
-        with open(self.__file_path, "w") as file:
-            json.dump(obj_dict, file)
-            return "OK"
+        """
+        This method saves the dictionary of objects to the JSON file.
+        """
+        objects_dict = {}
+        for key, value in self.__objects.items():
+            objects_dict[key] = value.to_dict()
+        with open(self.__file_path, "w", encoding='utf-8') as fl:
+            json.dump(objects_dict, fl, indent=4)
 
     '''deserializes the JSON file to __objects'''
 
