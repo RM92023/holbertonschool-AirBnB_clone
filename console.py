@@ -3,11 +3,11 @@
 import cmd
 from models.base_model import BaseModel
 from models.user import User
-# from models.place import Place
-# from models.state import State
-# from models.city import City
-# from models.amenity import Amenity
-# from models.review import Review
+from models.place import Place
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.review import Review
 from models import storage
 from typing import Tuple, Optional
 import inspect
@@ -136,16 +136,16 @@ if __name__ == '__main__':
     HBNBCommand().cmdloop()
 
 
-    def complete_add(self, text: str) -> str:
+def complete_add(self, text: str) -> str:
 
-        options = [
-            'quit', 'help', 'all', 'show', 'destroy', 'update', 'BaseModel',
-            'User', 'Place', 'State', 'City', 'Amenity', 'Review'
-        ]
-        if text:
-            return [option for option in options if option.startswith(text)]
-        else:
-            return options
+    options = [
+        'quit', 'help', 'all', 'show', 'destroy', 'update', 'BaseModel',
+        'User', 'Place', 'State', 'City', 'Amenity', 'Review'
+    ]
+    if text:
+        return [option for option in options if option.startswith(text)]
+    else:
+        return options
 
     def default(self, line: str) -> None:
 
