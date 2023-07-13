@@ -1,140 +1,170 @@
+#!/usr/bin/python3
+"""a program called console.py"""
+
 import cmd
 import json
 from models.base_model import BaseModel
+from models import storage
 
 
 class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) '
 
     def do_quit(self, arg):
-        """Exit the program."""
+        """Quit command to exit the program"""
         return True
 
     def do_EOF(self, arg):
-        """Exit the program on EOF (Ctrl+D)."""
+        """Exit the program with Ctrl+D (EOF)"""
         return True
 
     def emptyline(self):
-        """Do nothing on empty line."""
+        """Do nothing when an empty line is entered"""
         pass
 
     def do_create(self, arg):
-        """Create a new instance of BaseModel."""
+        """Create a new instance of a given class"""
         if not arg:
             print("** class name missing **")
-        else:
-            try:
-                class_name = arg
-                new_instance = BaseModel()
-                new_instance.save()
-                print(new_instance.id)
-            except Exception as e:
-                print("** class doesn't exist **")
+            return
+
+        class_name = arg.split()[0]
+        if class_name not in self.classes:
+            print("** class doesn't exist **")
+            return
+
+        instance = self.classes[class_name]()
+        instance.save()
+        print(instance.id)
 
     def do_show(self, arg):
-        """Show the string representation of an instance."""
-        args = arg.split()
-        if not args:
+        """Print the string representation of an instance"""
+        if not arg:
             print("** class name missing **")
-        elif len(args) < 2:
+            return
+
+        args = arg.split()
+        if args[0] not in self.classes:
+            print("** class doesn't exist **")
+            return
+
+        if len(args) < 2:
             print("** instance id missing **")
+            return
+
+        instances = storage.all()
+        key = args[0] + '.' + args[1]
+        if key in instances:
+            print(instances[key])
         else:
-            class_name = args[0]
-            instance_id = args[1]
-            try:
-                with open("file.json", 'r') as file:
-                    data = json.load(file)
-                    key = "{}.{}".format(class_name, instance_id)
-                    if key in data:
-                        instance_data = data[key]
-                        instance = BaseModel(**instance_data)
-                        print(instance)
-                    else:
-                        print("** no instance found **")
-            except FileNotFoundError:
-                print("** no instance found **")
+            print("** no instance found **")
 
     def do_destroy(self, arg):
-        """Delete an instance based on class name and id."""
-        args = arg.split()
-        if not args:
+        """Delete an instance based on the class name and id"""
+        if not arg:
             print("** class name missing **")
-        elif len(args) < 2:
+            return
+
+        args = arg.split()
+        if args[0] not in self.classes:
+            print("** class doesn't exist **")
+            return
+
+        if len(args) < 2:
             print("** instance id missing **")
+            return
+
+        instances = storage.all()
+        key = args[0] + '.' + args[1]
+        if key in instances:
+            del instances[key]
+            storage.save()
         else:
-            class_name = args[0]
-            instance_id = args[1]
-            try:
-                with open("file.json", 'r+') as file:
-                    data = json.load(file)
-                    key = "{}.{}".format(class_name, instance_id)
-                    if key in data:
-                        del data[key]
-                        file.seek(0)
-                        json.dump(data, file)
-                        file.truncate()
-                    else:
-                        print("** no instance found **")
-            except FileNotFoundError:
-                print("** no instance found **")
+            print("** no instance found **")
 
     def do_all(self, arg):
-        """Print all string representations of instances."""
-        class_name = arg.split()[0] if arg else None
-        try:
-            with open("file.json", 'r') as file:
-                data = json.load(file)
-                instances = []
-                if class_name:
-                    for key, value in data.items():
-                        if key.split('.')[0] == class_name:
-                            instance = BaseModel(**value)
-                            instances.append(str(instance))
-                else:
-                    for value in data.values():
-                        instance = BaseModel(**value)
-                        instances.append(str(instance))
-                print(instances)
-        except FileNotFoundError:
+        """Print all string representations of instances"""
+        instances = storage.all()
+
+        if not arg:
+            print([str(value) for value in instances.values()])
+            return
+
+        args = arg.split()
+        if args[0] not in self.classes:
             print("** class doesn't exist **")
+            return
+
+        print([str(value) for key, value in instances.items() if key.startswith(args[0])])
 
     def do_update(self, arg):
-        """Update an instance based on class name and id."""
-        args = arg.split()
-        if not args:
+        """Update an instance based on the class name and id"""
+        if not arg:
             print("** class name missing **")
-        elif len(args) < 2:
-            print("** instance id missing **")
-        elif len(args) < 3:
-            print("** attribute name missing **")
-        elif len(args) < 4:
-            print("** value missing **")
-        else:
-            class_name = args[0]
-            instance_id = args[1]
-            attribute_name = args[2]
-            attribute_value = args[3]
+            return
 
-            try:
-                with open("file.json", 'r+') as file:
-                    data = json.load(file)
-                    key = "{}.{}".format(class_name, instance_id)
-                    if key in data:
-                        instance_data = data[key]
-                        instance = BaseModel(**instance_data)
-                        if hasattr(instance, attribute_name):
-                            setattr(instance, attribute_name, attribute_value)
-                            data[key] = instance.to_dict()
-                            file.seek(0)
-                            json.dump(data, file)
-                            file.truncate()
-                        else:
-                            print("** attribute doesn't exist **")
-                    else:
-                        print("** no instance found **")
-            except FileNotFoundError:
-                print("** no instance found **")
+        args = arg.split()
+        if args[0] not in self.classes:
+            print("** class doesn't exist **")
+            return
+
+        if len(args) < 2:
+            print("** instance id missing **")
+            return
+
+        instances = storage.all()
+        key = args[0] + '.' + args[1]
+        if key not in instances:
+            print("** no instance found **")
+            return
+
+        if len(args) < 3:
+            print("** attribute name missing **")
+            return
+
+        if len(args) < 4:
+            print("** value missing **")
+            return
+
+        instance = instances[key]
+        attribute = args[2]
+        value = args[3]
+
+        try:
+            value = json.loads(value)
+        except ValueError:
+            pass
+
+        setattr(instance, attribute, value)
+        instance.save()
+
+    def do_help(self, arg):
+        """Display help messages"""
+        commands = {
+            'quit': 'Quit command to exit the program',
+            'EOF': 'Exit the program with Ctrl+D (EOF)',
+            'create': 'Create a new instance of a given class',
+            'show': 'Print the string representation of an instance',
+            'destroy': 'Delete an instance based on the class name and id',
+            'all': 'Print all string representations of instances',
+            'update': 'Update an instance based on the class name and id'
+        }
+
+        if arg:
+            if arg in commands:
+                print(commands[arg])
+            else:
+                print("** No help available for '{}'".format(arg))
+        else:
+            print("Documented commands (type help <topic>):")
+            print("========================================")
+            for command, description in commands.items():
+                print("{:<10} {}".format(command, description))
 
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
+
+
+
+
