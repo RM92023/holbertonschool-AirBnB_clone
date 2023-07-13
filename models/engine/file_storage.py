@@ -26,15 +26,21 @@ class FileStorage:
     '''Function that serializes __objects to the JSON file '''
 
     def save(self):
+        """Serialize __objects to the JSON file __file_path."""
+        if self.__file_path is None:
+
+            return "OK"
         obj_dict = {key: obj.to_dict() for key, obj in self.__objects.items()}
-        with open(self.__file_path, 'w') as file:
+        with open(self.__file_path, "w") as file:
             json.dump(obj_dict, file)
+            return "OK"
 
     '''deserializes the JSON file to __objects'''
+
     def reload(self):
         class_mapping = {
-    'BaseModel': BaseModel,
-    }
+            'BaseModel': BaseModel,
+        }
         if os.path.isfile(self.__file_path):
             try:
                 with open(self.__file_path, 'r') as file:
