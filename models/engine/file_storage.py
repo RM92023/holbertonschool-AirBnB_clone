@@ -1,15 +1,15 @@
 #!/usr/bin/python3
 '''Import several library'''
 import json
+import os
+import importlib
 from models.base_model import BaseModel
 '''Create to class call Filestorage'''
 
 
 class FileStorage:
     '''Attributes for tha class'''
-    classes = {
-    'BaseModel': BaseModel,
-    }
+
     __file_path = 'file.json'
     __objects = {}
 
@@ -27,22 +27,24 @@ class FileStorage:
     '''Function that serializes __objects to the JSON file '''
 
     def save(self):
-        data = {}
-        for key, value in self.__objects.items():
-            data[key] = value.to_dict()
-
-    
+        obj_dict = {key: obj.to_dict() for key, obj in self.__objects.items()}
+        with open(self.__file_path, 'w') as file:
+            json.dump(obj_dict, file)
 
     '''deserializes the JSON file to __objects'''
     def reload(self):
-        try:
-            with open(self.__file_path, "r") as file:
-                data = json.load(file)
-                for key, value in data.items():
-                    class_name, obj_id = key.split('.')
-                    class_obj = globals().get(class_name)
-                    if class_obj:
-                        instance = class_obj(**value)
-                        self.new(instance)
-        except FileNotFoundError:
-            pass
+        class_mapping = {
+    'BaseModel': BaseModel,
+    }
+        if os.path.isfile(self.__file_path):
+            try:
+                with open(self.__file_path, 'r') as file:
+                    obj_dict = json.load(file)
+                    for key, value in obj_dict.items():
+                        class_name = value['__class__']
+                        if class_name in class_mapping:
+                            class_ = class_mapping[class_name]
+                            obj = class_(**value)
+                            self.__objects[key] = obj
+            except FileNotFoundError:
+                return
