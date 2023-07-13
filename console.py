@@ -30,281 +30,207 @@ class HBNBCommand(cmd.Cmd):
     def do_EOF(self, args: str) -> bool:
         return True
 
-    def do_create(self, args: str) -> None:
-        arg_list = args.split()
-        if not arg_list:
+    def do_create(self, arg):
+        if not arg:
             print("** class name missing **")
-            return
-        class_name = arg_list[0]
-        if class_name not in class_names_str:
+        elif arg == "BaseModel":
+            new_instance = BaseModel()
+            new_instance.save()
+            print(new_instance.id)
+        elif arg == "User":
+            new_user = User()
+            new_user.save()
+            print(new_user.id)
+        else:
             print("** class doesn't exist **")
-            return
 
-        new_instance = eval(class_name)()
+    def do_show(self, arg):
 
-        new_instance.save()
-        print(new_instance.id)
-
-    def do_show(self, args: str) -> None:
-        arg_list = args.split()
-        if not arg_list:
+        args = arg.split()
+        if not args:
             print("** class name missing **")
-            return
-
-        class_name = arg_list[0]
-
-        if class_name not in class_names_str:
-            print("** class doesn't exist **")
-            return
-        if len(arg_list) < 2:
+        elif len(args) < 2:
             print("** instance id missing **")
-            return
+        else:
+            class_name = args[0]
+            instance_id = args[1]
+            if class_name == "User":
+                try:
+                    user = self.storage.get(User, instance_id)
+                    print(user)
+                except Exception:
+                    print("** no instance found **")
+            else:
+                print("** class doesn't exist **")
 
-        instance_id = arg_list[1]
+    def do_all(self, arg):
+        """Print all string representations of instances."""
+        if arg == "User":
+            users = self.storage.all(User).values()
+            print([str(user) for user in users])
+        elif not arg:
+            all_objs = self.storage.all()
+            print([str(obj) for obj in all_objs.values()])
+        else:
+            print("** class doesn't exist **")
 
-        model = all_data.get(f"{class_name}.{instance_id}", None)
+    def do_destroy(self, arg):
 
-        if model is None:
-            print("** no instance found **")
-            return
+        args = arg.split()
+        if not args:
+            print("** class name missing **")
+        elif len(args) < 2:
+            print("** instance id missing **")
+        else:
+            class_name = args[0]
+            instance_id = args[1]
+            if class_name == "User":
+                try:
+                    user = self.storage.get(User, instance_id)
+                    self.storage.delete(user)
+                    self.storage.save()
+                except Exception:
+                    print("** no instance found **")
+            else:
+                print("** class doesn't exist **")
 
-        print(model)
 
-    def do_all(self, args: Optional[str]) -> None:
+    def do_update(self, arg):
+        """Update an instance based on class name and id."""
+        args = arg.split()
+        if not args:
+            print("** class name missing **")
+        elif len(args) < 2:
+            print("** instance id missing **")
+        elif len(args) < 3:
+            print("** attribute name missing **")
+        elif len(args) < 4:
+            print("** value missing **")
+        else:
+            class_name = args[0]
+            instance_id = args[1]
+            attribute_name = args[2]
+            attribute_value = args[3]
+            if class_name == "User":
+                try:
+                    user = self.storage.get(User, instance_id)
+                    setattr(user, attribute_name, attribute_value)
+                    self.storage.save()
+                except Exception:
+                    print("** no instance found **")
+            else:
+                print("** class doesn't exist **")
+
+    def do_count(self, args: str) -> None:
 
         arg_list = args.split()
+        if not arg_list:
+            print("** class name missing **")
+            return
         if arg_list and arg_list[0] not in class_names_str:
             print("** class doesn't exist **")
             return
-        try:
-            class_name = arg_list[0]
-        except Exception:
-            pass
+        class_count = 0
+        for key in all_data.keys():
+            to_compare = key.split('.')[0]
+            if to_compare == arg_list[0]:
+                class_count += 1
+        print(class_count)
 
-        objects = [str(obj) for obj in all_data.values()  # if only write all
-                   if args == "" or str(obj).startswith(f"[{class_name}]")]
-
-        print(objects)
-
-    def do_destroy(self, args: str) -> None:
-
-        arg_list = args.split()
-        if not arg_list:
-            print("** class name missing **")
-            return
-
-        class_name = arg_list[0]
-
-        if class_name not in class_names_str:
-            print("** class doesn't exist **")
-            return
-        if len(arg_list) < 2:
-            print("** instance id missing **")
-            return
-
-        instance_id = arg_list[1]
+    def _parse_args(self, arguments: str) -> Tuple[str, str]:
 
         try:
-            all_data.pop(f"{class_name}.{instance_id}")
-        except KeyError:
-            print("** no instance found **")
-            return
+            method = arguments.split('(')[0].strip('.')
+            raw_args = arguments.split('(')[1].strip(')')
 
-        storage.save()
-
-    def do_update(self, args: str) -> None:
-
-        arg_list = args.split()
-        if not arg_list:
-            print("** class name missing **")
-            return
-
-        class_name = arg_list[0]
-
-        if class_name not in class_names_str:
-            print("** class doesn't exist **")
-            return
-        if len(arg_list) < 2:
-            print("** instance id missing **")
-            return
-
-        instance_id = arg_list[1]
-
-        instance = all_data.get(f"{class_name}.{instance_id}", None)
-
-        if instance is None:
-            print("** no instance found **")
-            return
-
-        if len(arg_list) < 3:
-            print("** attribute name missing **")
-            return
-
-        if len(arg_list) < 4:
-            print("** value missing **")
-            return
-
-        is_dict = False
-        for i in args:
-            if i == '{':
-                is_dict = True
-
-        if is_dict:
-            dicty = "".join(arg_list[2:])
-            dictionary = eval(dicty)
-
-            if (isinstance(dictionary, dict)):
-                for key, value in dictionary.items():
-                    setattr(instance, key, value)
-
-                instance.save()
-                return
-
-        attribute_name = arg_list[2]
-        attribute_value = eval(arg_list[3])
-
-        if attribute_name in ["id", "created_at", "updated_at"]:
-            print("** this attribute can't be change **")
-            return
-
-        setattr(instance, attribute_name, attribute_value)
-
-        instance.save()
-
-    def complete_add(self, text: str) -> str:
-
-        options = [
-            'quit', 'help', 'all', 'show', 'destroy', 'update', 'BaseModel',
-            'User', 'Place', 'State', 'City', 'Amenity', 'Review'
-        ]
-        if text:
-            return [option for option in options if option.startswith(text)]
-        else:
-            return options
-
-    def default(self, line: str) -> None:
-
-        print_string = f"Command '{line}' not found, "
-        print_string += f"please type help to display the commands availables"
-        print(print_string)
-
-
-def emptyline(self) -> None:
-
-    pass
-
-
-def do_count(self, args: str) -> None:
-
-    arg_list = args.split()
-    if not arg_list:
-        print("** class name missing **")
-        return
-    if arg_list and arg_list[0] not in class_names_str:
-        print("** class doesn't exist **")
-        return
-    class_count = 0
-    for key in all_data.keys():
-        to_compare = key.split('.')[0]
-        if to_compare == arg_list[0]:
-            class_count += 1
-    print(class_count)
-
-
-def _parse_args(self, arguments: str) -> Tuple[str, str]:
-
-    try:
-        method = arguments.split('(')[0].strip('.')
-        raw_args = arguments.split('(')[1].strip(')')
-
-        is_dict = False
-        for i in raw_args:
-            if i == '{':
-                is_dict = True
-        if is_dict:
-            line_parse = raw_args.split('{')
-            id_string = line_parse[0].replace('"', '').replace(",", "")
-            dict = "{" + line_parse[1]
-            args = f"{id_string} {dict}"
-        else:
-            ag_lt = raw_args.split(", ")
-            if len(ag_lt) == 3:
-                if isinstance(eval(ag_lt[2]), int):
-                    args = (raw_args.replace(',', '')).replace('"', '')
-                else:
-                    arg = (ag_lt[0] + " " + ag_lt[1]).replace('"', '')
-                    args = arg + " " + ag_lt[2]
+            is_dict = False
+            for i in raw_args:
+                if i == '{':
+                    is_dict = True
+            if is_dict:
+                line_parse = raw_args.split('{')
+                id_string = line_parse[0].replace('"', '').replace(",", "")
+                dict = "{" + line_parse[1]
+                args = f"{id_string} {dict}"
             else:
-                args = (raw_args.replace(',', '')).replace('"', '')
-    except Exception as e:
-        print("Syntax Error")
-        print("Error: ", e)
-        return
+                ag_lt = raw_args.split(", ")
+                if len(ag_lt) == 3:
+                    if isinstance(eval(ag_lt[2]), int):
+                        args = (raw_args.replace(',', '')).replace('"', '')
+                    else:
+                        arg = (ag_lt[0] + " " + ag_lt[1]).replace('"', '')
+                        args = arg + " " + ag_lt[2]
+                else:
+                    args = (raw_args.replace(',', '')).replace('"', '')
+        except Exception as e:
+            print("Syntax Error")
+            print("Error: ", e)
+            return
 
-    callerframerecord = inspect.stack()[1]
+        callerframerecord = inspect.stack()[1]
 
-    frame = callerframerecord[0]
+        frame = callerframerecord[0]
 
-    info = inspect.getframeinfo(frame)
+        info = inspect.getframeinfo(frame)
 
-    name_function = info.function.strip("do_")
+        name_function = info.function.strip("do_")
 
-    if args != "":
-        internal_args = f"{name_function} {args}"
-    else:
-        internal_args = f"{name_function}"
+        if args != "":
+            internal_args = f"{name_function} {args}"
+        else:
+            internal_args = f"{name_function}"
 
-    return (method, internal_args)
-
-
-def _execute(self, method: str, internal_args: str) -> None:
-
-    try:
-        eval("self.do_{}".format(method))(internal_args)
-    except Exception:
-        print("Be sure that the argument is valid")
-
-
-def do_BaseModel(self, arguments: str) -> None:
-
-    method, internal_args = self._parse_args(arguments)
-    self._execute(method, internal_args)
+        return (method, internal_args)
 
 
-def do_User(self, arguments: str) -> None:
+    def _execute(self, method: str, internal_args: str) -> None:
 
-    method, internal_args = self._parse_args(arguments)
-    self._execute(method, internal_args)
-
-
-def do_Place(self, arguments: str) -> None:
-
-    method, internal_args = self._parse_args(arguments)
-    self._execute(method, internal_args)
+        try:
+            eval("self.do_{}".format(method))(internal_args)
+        except Exception:
+            print("Be sure that the argument is valid")
 
 
-def do_Amenity(self, arguments: str) -> None:
+    def do_BaseModel(self, arguments: str) -> None:
 
-    method, internal_args = self._parse_args(arguments)
-    self._execute(method, internal_args)
-
-
-def do_City(self, arguments: str) -> None:
-
-    method, internal_args = self._parse_args(arguments)
-    self._execute(method, internal_args)
+        method, internal_args = self._parse_args(arguments)
+        self._execute(method, internal_args)
 
 
-def do_Review(self, arguments: str) -> None:
+    def do_User(self, arguments: str) -> None:
 
-    method, internal_args = self._parse_args(arguments)
-    self._execute(method, internal_args)
+        method, internal_args = self._parse_args(arguments)
+        self._execute(method, internal_args)
 
 
-def do_State(self, arguments: str) -> None:
+    def do_Place(self, arguments: str) -> None:
 
-    method, internal_args = self._parse_args(arguments)
-    self._execute(method, internal_args)
+        method, internal_args = self._parse_args(arguments)
+        self._execute(method, internal_args)
+
+
+    def do_Amenity(self, arguments: str) -> None:
+
+        method, internal_args = self._parse_args(arguments)
+        self._execute(method, internal_args)
+
+
+    def do_City(self, arguments: str) -> None:
+
+        method, internal_args = self._parse_args(arguments)
+        self._execute(method, internal_args)
+
+
+    def do_Review(self, arguments: str) -> None:
+
+        method, internal_args = self._parse_args(arguments)
+        self._execute(method, internal_args)
+
+
+    def do_State(self, arguments: str) -> None:
+
+        method, internal_args = self._parse_args(arguments)
+        self._execute(method, internal_args)
 
 
 if __name__ == '__main__':
