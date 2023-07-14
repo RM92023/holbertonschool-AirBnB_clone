@@ -73,15 +73,6 @@ class TestFileStorage(unittest.TestCase):
     #     storage.all().clear()
     #     os.remove('file.json')
 
-    def test_save(self):
-        self.base_model.updated_at = datetime.utcnow()
-        self.storage.new(self.base_model)
-        self.assertEqual(self.storage.save(), None)
-
-    def test_reload(self):
-        self.assertEqual(self.storage.reload(), None)
-        os.remove('file.json')
-
     def test_file_storage_attributes(self):
         """
         Testing FileStorage atributtes
@@ -91,6 +82,15 @@ class TestFileStorage(unittest.TestCase):
         storage._FileStorage__objects = {}
         self.assertEqual(storage._FileStorage__file_path, 'file.json')
         self.assertEqual(storage._FileStorage__objects, {})
+
+    def test_save(self):
+        self.base_model.updated_at = datetime.utcnow()
+        self.storage.new(self.base_model)
+        self.assertEqual(self.storage.save(), None)
+
+    def test_reload(self):
+        self.assertEqual(self.storage.reload(), None)
+        os.remove('file.json')
 
 
 if __name__ == '__main__':
