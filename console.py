@@ -10,6 +10,11 @@ from models import storage
 
 
 class HBNBCommand(cmd.Cmd):
+
+    """
+    This is a command-line interface for
+    interacting with your program.
+    """
     prompt = "(hbnb) "
 
     def do_quit(self, arg):
