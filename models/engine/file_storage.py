@@ -37,5 +37,12 @@ class FileStorage():
             with open(FileStorage.__file_path) as file:
                 loaded = json.load(file)
                 for k, v in loaded.items():
-                    obj = eval(v["__class__"])(**v)
+                    class_name = v['__class__']
+                    obj = eval(class_name)(**v)
                     self.__objects[k] = obj
+        else:##
+            self.__objects = {}
+#
+storage = FileStorage()
+#
+storage.reload()
