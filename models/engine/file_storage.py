@@ -16,7 +16,7 @@ class FileStorage():
     '''Function that return a object'''
 
     def all(self):
-        return self.__objects.copy()
+        return self.__objects
 
     '''sets in __objects the obj with key'''
 
@@ -39,5 +39,3 @@ class FileStorage():
                 for k, v in loaded.items():
                     obj = eval(v["__class__"])(**v)
                     self.__objects[k] = obj
-        else:
-            return
