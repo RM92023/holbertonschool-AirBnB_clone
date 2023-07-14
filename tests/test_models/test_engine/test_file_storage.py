@@ -78,7 +78,7 @@ class TestFileStorage(unittest.TestCase):
         Testing FileStorage atributtes
         """
         storage = FileStorage()
-        #storage.reload()
+        storage.reload()
         storage._FileStorage__objects = {}
         self.assertEqual(storage._FileStorage__file_path, 'file.json')
         self.assertEqual(storage._FileStorage__objects, {})
