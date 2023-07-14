@@ -17,6 +17,10 @@ class HBNBCommand(cmd.Cmd):
         """Exit the program on EOF (Ctrl+D)."""
         return True
 
+    def emptyline(self):
+        """Do nothing on empty line."""
+        pass
+
     def do_create(self, arg):
         """Create a new instance of BaseModel or User."""
         if arg == "BaseModel":
@@ -98,10 +102,6 @@ class HBNBCommand(cmd.Cmd):
         attribute_value = args[3]
         setattr(all_objs[key], attribute_name, attribute_value)
         all_objs[key].save()
-
-    def emptyline(self):
-        """Do nothing on empty line."""
-        pass
 
 
 if __name__ == '__main__':
