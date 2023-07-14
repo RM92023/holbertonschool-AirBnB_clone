@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+'''Import several library'''
 import cmd
 from models.base_model import BaseModel
 from models.user import User
@@ -12,6 +12,7 @@ from models import storage
 from typing import Tuple, Optional
 import inspect
 
+'''Create a dictionary for the User'''
 
 class_names_str = [
     "BaseModel", "User", "Place", "State",
@@ -19,9 +20,14 @@ class_names_str = [
     ]
 all_data = storage.all()
 
+'''Create class HBNBCommand'''
+
 
 class HBNBCommand(cmd.Cmd):
-    """Command-line interface for the AIRBNB project."""
+
+    """Command-line interface for
+    the AIRBNB project.
+    """
 
     prompt = "(hbnb) "
 
@@ -42,7 +48,6 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
             return
 
-        # Process
         new_instance = eval(class_name)()
 
         new_instance.save()
@@ -194,7 +199,7 @@ class HBNBCommand(cmd.Cmd):
         print_string = f"Command '{line}' not found, "
         print_string += f"please type help to display the commands availables"
         print(print_string)
-        
+
     def emptyline(self) -> None:
         pass
 
