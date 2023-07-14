@@ -52,15 +52,6 @@ class TestFileStorage(unittest.TestCase):
         storage = FileStorage()
         self.assertEqual(storage._FileStorage__file_path, 'file.json')
 
-    def test_file_storage_attributes(self):
-         """
-         Testing FileStorage atributtes
-         """
-         storage = FileStorage()
-         storage.reload()
-         self.assertEqual(storage._FileStorage__file_path, 'file.json')
-         self.assertEqual(storage._FileStorage__objects, {})
-
     # def test_file_storage_methods(self):
     #     """
     #     Testing FileStorage methods
@@ -90,6 +81,16 @@ class TestFileStorage(unittest.TestCase):
     def test_reload(self):
         self.assertEqual(self.storage.reload(), None)
         os.remove('file.json')
+
+    def test_file_storage_attributes(self):
+        """
+        Testing FileStorage atributtes
+        """
+        storage = FileStorage()
+        storage.reload()
+        storage._FileStorage__objects = {}
+        self.assertEqual(storage._FileStorage__file_path, 'file.json')
+        self.assertEqual(storage._FileStorage__objects, {})
 
 
 if __name__ == '__main__':
