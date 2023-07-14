@@ -16,7 +16,7 @@ class FileStorage():
     '''Function that return a object'''
 
     def all(self):
-        return self.__objects
+        return self.__objects.copy()
 
     '''sets in __objects the obj with key'''
 
@@ -37,7 +37,7 @@ class FileStorage():
             with open(FileStorage.__file_path) as file:
                 loaded = json.load(file)
                 for k, v in loaded.items():
-                    obj = eval(v["__class__"])(**v)
-                    self.__objects[k] = obj
-        else:
-            return
+                    class_name, obj_id = k.split('.')
+                    if class_name == 'BaseModel':
+                        obj = BaseModel(**v)
+                        self.new(obj)
