@@ -39,3 +39,5 @@ class FileStorage():
                 for k, v in loaded.items():
                     obj = eval(v["__class__"])(**v)
                     self.__objects[k] = obj
+        else:
+            return
