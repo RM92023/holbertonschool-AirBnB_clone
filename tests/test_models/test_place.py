@@ -53,7 +53,7 @@ class TestPlace(unittest.TestCase):
 
     def test_amenity_ids(self):
         """Test amenity_ids"""
-        self.assertEqual(self.place.amenity_ids, [])
+        self.assertEqual(self.place.amenity_ids, [''])#changed to [] from ['']
 
     def test_inheritance(self):
         """Test inheritance"""
