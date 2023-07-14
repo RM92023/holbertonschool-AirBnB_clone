@@ -37,7 +37,5 @@ class FileStorage():
             with open(FileStorage.__file_path) as file:
                 loaded = json.load(file)
                 for k, v in loaded.items():
-                    class_name, obj_id = k.split('.')
-                    if class_name == 'BaseModel':
-                        obj = BaseModel(**v)
-                        self.new(obj)
+                    obj = eval(v["__class__"])(**v)
+                    self.__objects[k] = obj
