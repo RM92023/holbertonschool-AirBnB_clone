@@ -41,4 +41,4 @@ class FileStorage():
                     obj = eval(class_name)(**v)
                     self.__objects[k] = obj
         else:
-            return
+            self.__objects = {}
