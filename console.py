@@ -27,9 +27,6 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, arg):
         """Create a new instance of BaseModel or User."""
-        if not arg:
-            print("** class name missing **")
-            return
         if arg == "BaseModel":
             new_instance = BaseModel()
         elif arg == "User":
@@ -44,41 +41,33 @@ class HBNBCommand(cmd.Cmd):
     def do_show(self, arg):
         """Show the string representation of an instance."""
         args = arg.split()
-        if not args:
-            print("** class name missing **")
-            return
         if len(args) < 2:
-            print("** instance id missing **")
-            return
-
-        class_name = args[0]
-        instance_id = args[1]
-        key = "{}.{}".format(class_name, instance_id)
-        all_objs = storage.all()
-        if key not in all_objs:
-            print("** no instance found **")
-            return
+            print("** class name missing **")
+        else:
+            class_name = args[0]
+            instance_id = args[1]
+            key = "{}.{}".format(class_name, instance_id)
+            all_objs = storage.all()
+            if key in all_objs:
+                print(all_objs[key])
+            else:
+                print("** no instance found **")
 
     def do_destroy(self, arg):
         """Delete an instance based on class name and id."""
         args = arg.split()
-        if not args:
-            print("** class name missing **")
-            return
         if len(args) < 2:
-            print("** instance id missing **")
-            return
-
-        class_name = args[0]
-        instance_id = args[1]
-        key = "{}.{}".format(class_name, instance_id)
-        all_objs = storage.all()
-        if key in all_objs:
-            del all_objs[key]
-            storage.save()
+            print("** class name missing **")
         else:
-            print("** no instance found **")
-            return
+            class_name = args[0]
+            instance_id = args[1]
+            key = "{}.{}".format(class_name, instance_id)
+            all_objs = storage.all()
+            if key in all_objs:
+                del all_objs[key]
+                storage.save()
+            else:
+                print("** no instance found **")
 
     def do_all(self, arg):
         """Print all string representations of instances."""
@@ -97,13 +86,9 @@ class HBNBCommand(cmd.Cmd):
     def do_update(self, arg):
         """Update an instance based on class name and id."""
         args = arg.split()
-        if not args:
+        if len(args) < 2:
             print("** class name missing **")
             return
-        if len(args) < 2:
-            print("** instance id missing **")
-            return
-
         class_name = args[0]
         instance_id = args[1]
         key = "{}.{}".format(class_name, instance_id)
@@ -111,6 +96,16 @@ class HBNBCommand(cmd.Cmd):
         if key not in all_objs:
             print("** no instance found **")
             return
+        if len(args) < 3:
+            print("** attribute name missing **")
+            return
+        if len(args) < 4:
+            print("** value missing **")
+            return
+        attribute_name = args[2]
+        attribute_value = args[3]
+        setattr(all_objs[key], attribute_name, attribute_value)
+        all_objs[key].save()
     
     def emptyline(self):
         """Do nothing on empty line."""
