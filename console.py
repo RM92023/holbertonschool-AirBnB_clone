@@ -2,7 +2,6 @@
 
 import cmd
 from models import storage
-from models.base_model import BaseModel
 
 class HBNBCommand(cmd.Cmd):
     prompt = "(hbnb) "
@@ -121,9 +120,6 @@ class HBNBCommand(cmd.Cmd):
             if len(arg_list) < 4:
                 print("** value missing **")
                 return
-
-            setattr(objects[key], arg_list[2], eval(arg_list[3]))
-            storage.save()
         else:
             print("** no instance found **")
 
