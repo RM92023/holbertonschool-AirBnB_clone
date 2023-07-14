@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-'''Import several library'''
+'''Import several libraries'''
 import cmd
 from models.base_model import BaseModel
 from models.user import User
@@ -13,11 +13,10 @@ from typing import Tuple, Optional
 import inspect
 
 '''Create a dictionary for the User'''
-
 class_names_str = [
     "BaseModel", "User", "Place", "State",
     "City", "Amenity", "Review"
-    ]
+]
 all_data = storage.all()
 
 '''Create class HBNBCommand'''
@@ -32,13 +31,15 @@ class HBNBCommand(cmd.Cmd):
     prompt = "(hbnb) "
 
     def do_quit(self, args: str) -> bool:
+        """Exit the program."""
         return True
 
     def do_EOF(self, args: str) -> bool:
+        """Exit the program on EOF (Ctrl+D)."""
         return True
 
     def do_create(self, args: str) -> None:
-
+        """Create a new instance of BaseModel or User."""
         arg_list = args.split()
         if not arg_list:
             print("** class name missing **")
@@ -54,7 +55,7 @@ class HBNBCommand(cmd.Cmd):
         print(new_instance.id)
 
     def do_show(self, args: str) -> None:
-
+        """Show the string representation of an instance."""
         arg_list = args.split()
         if not arg_list:
             print("** class name missing **")
@@ -81,7 +82,7 @@ class HBNBCommand(cmd.Cmd):
         print(model)
 
     def do_all(self, args: Optional[str]) -> None:
-
+        """Print all string representations of instances."""
         arg_list = args.split()
         if arg_list and arg_list[0] not in class_names_str:
             print("** class doesn't exist **")
@@ -98,7 +99,7 @@ class HBNBCommand(cmd.Cmd):
         print(objects)
 
     def do_destroy(self, args: str) -> None:
-
+        """Delete an instance based on class name and id."""
         arg_list = args.split()
         if not arg_list:
             print("** class name missing **")
@@ -125,7 +126,7 @@ class HBNBCommand(cmd.Cmd):
         storage.save()
 
     def do_update(self, args: str) -> None:
-
+        """Update an instance based on class name and id."""
         arg_list = args.split()
         if not arg_list:
             print("** class name missing **")
@@ -165,7 +166,7 @@ class HBNBCommand(cmd.Cmd):
             dicty = "".join(arg_list[2:])
             dictionary = eval(dicty)
 
-            if (isinstance(dictionary, dict)):
+            if isinstance(dictionary, dict):
                 for key, value in dictionary.items():
                     setattr(instance, key, value)
 
@@ -176,7 +177,7 @@ class HBNBCommand(cmd.Cmd):
         attribute_value = eval(arg_list[3])
 
         if attribute_name in ["id", "created_at", "updated_at"]:
-            print("** this attribute can't be change **")
+            print("** this attribute can't be changed **")
             return
 
         setattr(instance, attribute_name, attribute_value)
@@ -184,27 +185,28 @@ class HBNBCommand(cmd.Cmd):
         instance.save()
 
     def complete_add(self, text: str) -> str:
-
+        """Autocomplete for the add command."""
         options = [
             'quit', 'help', 'all', 'show', 'destroy', 'update', 'BaseModel',
             'User', 'Place', 'State', 'City', 'Amenity', 'Review'
-            ]
+        ]
         if text:
             return [option for option in options if option.startswith(text)]
         else:
             return options
 
     def default(self, line: str) -> None:
-
+        """Default handler for unknown commands."""
         print_string = f"Command '{line}' not found, "
-        print_string += f"please type help to display the commands availables"
+        print_string += f"please type help to display the available commands"
         print(print_string)
 
     def emptyline(self) -> None:
+        """Do nothing on empty line."""
         pass
 
     def do_count(self, args: str) -> None:
-
+        """Count the number of instances of a class."""
         arg_list = args.split()
         if not arg_list:
             print("** class name missing **")
@@ -220,7 +222,7 @@ class HBNBCommand(cmd.Cmd):
         print(class_count)
 
     def _parse_args(self, arguments: str) -> Tuple[str, str]:
-
+        """Parse the arguments passed to the class-specific commands."""
         try:
             method = arguments.split('(')[0].strip('.')
             raw_args = arguments.split('(')[1].strip(')')
@@ -232,8 +234,8 @@ class HBNBCommand(cmd.Cmd):
             if is_dict:
                 line_parse = raw_args.split('{')
                 id_string = line_parse[0].replace('"', '').replace(",", "")
-                dict = "{" + line_parse[1]
-                args = f"{id_string} {dict}"
+                dicty = "{" + line_parse[1]
+                args = f"{id_string} {dicty}"
             else:
                 ag_lt = raw_args.split(", ")
                 if len(ag_lt) == 3:
@@ -263,44 +265,44 @@ class HBNBCommand(cmd.Cmd):
         return (method, internal_args)
 
     def _execute(self, method: str, internal_args: str) -> None:
-
+        """Execute the class-specific commands."""
         try:
             eval("self.do_{}".format(method))(internal_args)
         except Exception:
             print("Be sure that the argument is valid")
 
     def do_BaseModel(self, arguments: str) -> None:
-
+        """Class-specific command for BaseModel."""
         method, internal_args = self._parse_args(arguments)
         self._execute(method, internal_args)
 
     def do_User(self, arguments: str) -> None:
-
+        """Class-specific command for User."""
         method, internal_args = self._parse_args(arguments)
         self._execute(method, internal_args)
 
     def do_Place(self, arguments: str) -> None:
-
+        """Class-specific command for Place."""
         method, internal_args = self._parse_args(arguments)
         self._execute(method, internal_args)
 
     def do_Amenity(self, arguments: str) -> None:
-
+        """Class-specific command for Amenity."""
         method, internal_args = self._parse_args(arguments)
         self._execute(method, internal_args)
 
     def do_City(self, arguments: str) -> None:
-
+        """Class-specific command for City."""
         method, internal_args = self._parse_args(arguments)
         self._execute(method, internal_args)
 
     def do_Review(self, arguments: str) -> None:
-
+        """Class-specific command for Review."""
         method, internal_args = self._parse_args(arguments)
         self._execute(method, internal_args)
 
     def do_State(self, arguments: str) -> None:
-
+        """Class-specific command for State."""
         method, internal_args = self._parse_args(arguments)
         self._execute(method, internal_args)
 
