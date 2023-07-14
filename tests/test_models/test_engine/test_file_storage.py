@@ -86,7 +86,13 @@ class TestFileStorage(unittest.TestCase):
     def test_save(self):
         self.base_model.updated_at = datetime.utcnow()
         self.storage.new(self.base_model)
-        self.assertEqual(self.storage.save(), None)
+        self.storage.save()
+        with open(self.storage._FileStorage__file_path, 'r') as file:
+            data = json.load(file)
+            key = "{}.{}".format(
+                type(self.base_model).__name__, self.base_model.id)
+            self.assertIn(key, data)
+            self.assertEqual(data[key], self.base_model.to_dict())
 
     def test_reload(self):
         self.assertEqual(self.storage.reload(), None)
