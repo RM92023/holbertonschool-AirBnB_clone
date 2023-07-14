@@ -7,6 +7,15 @@ from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
 
 
+import models
+from models.user import User
+from models.state import State
+from models.amenity import Amenity
+from models.city import City
+from models.review import Review
+from models.place import Place
+
+
 class TestFileStorage(unittest.TestCase):
     def setUp(self):
         self.storage = FileStorage()
@@ -84,6 +93,18 @@ class TestFileStorage(unittest.TestCase):
         self.base_model.updated_at = datetime.utcnow()
         self.storage.new(self.base_model)
         self.assertEqual(self.storage.save(), None)
+    
+    def test_save_method(self):
+        """Time to deal with reload() method in FileStorage class"""
+        character_bm = BaseModel()
+        character_user = User()
+        character_state = State()
+        character_city = City()
+        character_place = Place()
+        character_review = Review()
+        character_amenity = Amenity()
+
+        models.storage.save()
 
     def test_reload(self):
         self.assertEqual(self.storage.reload(), None)
