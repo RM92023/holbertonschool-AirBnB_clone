@@ -106,6 +106,35 @@ class TestFileStorage(unittest.TestCase):
 
         models.storage.save()
 
+        # Checks that the objects created above are stored already
+        self.assertIn("BaseModel." + character_bm.id,
+                      models.storage.all().keys())
+        self.assertIn(character_bm, models.storage.all().values())
+        self.assertIn("User." + character_user.id, models.storage.all().keys())
+        self.assertIn(character_user, models.storage.all().values())
+        self.assertIn("State." + character_state.id, models.storage.all().keys())
+        self.assertIn(character_state, models.storage.all().values())
+        self.assertIn("Place." + character_place.id, models.storage.all().keys())
+        self.assertIn(character_place, models.storage.all().values())
+        self.assertIn("City." + character_city.id, models.storage.all().keys())
+        self.assertIn(character_city, models.storage.all().values())
+        self.assertIn("Amenity." + character_amenity.id,
+                      models.storage.all().keys())
+        self.assertIn(character_amenity, models.storage.all().values())
+        self.assertIn("Review." + character_review.id,
+                      models.storage.all().keys())
+        self.assertIn(character_review, models.storage.all().values())
+
+        # What if more than one arg were passed to this guy?
+        # TypeError, we need you here!
+        with self.assertRaises(TypeError):
+            models.storage.new(BaseModel(), 1)
+
+        # What if None was passed? That guy needs learn a lesson...
+        # AttributeError, will you join us?
+        with self.assertRaises(AttributeError):
+            models.storage.new(None)
+
     def test_reload(self):
         self.assertEqual(self.storage.reload(), None)
         os.remove('file.json')
