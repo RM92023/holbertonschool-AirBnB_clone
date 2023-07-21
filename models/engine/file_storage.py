@@ -38,5 +38,7 @@ class FileStorage():
                 loaded = json.load(file)
                 for k, v in loaded.items():
                     class_name = v['__class__']
-                    obj = eval(class_name)(**v)
-                    self.__objects[k] = obj
+                    model_class = globals().get(class_name)
+                    if model_class:
+                        obj = model_class(**v)
+                        self.__objects[k] = obj
